@@ -1,0 +1,3 @@
+Name:fds
+Race:fds
+Spawn Point:fds
