@@ -76,6 +76,9 @@ class Play:
         self.playerName: str = str()
         self.botName: str = str()
         self.playType: str = str()
+        self.isOutBot: bool = False
+        self.isOutPlayer: bool = False
+        self.outCounter: int = 0
 
     def start(self):
         playerName = input("Enter your name: ")
@@ -116,6 +119,8 @@ class Play:
                 if self.human.currentHit == self.bot.currentHit:
                     self.human.remainingWicket -= 1
                     print("Ok")
+                    self.isOutPlayer = self.human.remainingWicket == 0 or (
+                            self.human.remainingOver == self.human.remainingBalls == 0)
                 else:
                     self.human.totalScore += self.human.currentHit
             else:
@@ -126,31 +131,25 @@ class Play:
                 if self.bot.currentHit == self.human.currentHit:
                     self.bot.remainingWicket -= 1
                     print("Ok")
+                    self.isOutBot = self.human.remainingWicket == 0 or (
+                            self.human.remainingOver == self.human.remainingBalls == 0)
                 else:
                     self.bot.totalScore += self.bot.currentHit
-            if ((self.human.remainingWicket == 0 or
-                (self.human.remainingOver == 0 and self.human.remainingBalls == 0) and self.bot.remainingWicket != 0) or
-                (self.bot.remainingWicket == 0 or
-                (self.bot.remainingOver == 0 and self.bot.remainingBalls == 0) and self.human.remainingWicket != 0)):
+            if self.isOutBot or self.isOutPlayer and self.outCounter == 0:
                 print("Pog")
+                self.outCounter += 1
                 self.playType = "o" if self.playType == "d" else "d"
-            if ((self.human.remainingWicket == 0 or self.human.remainingOver == 0 and self.human.remainingBalls == 0) and
-                    (self.human.remainingWicket == 0 or self.human.remainingOver == 0 and self.bot.remainingBalls == 0)):
+            if self.isOutBot and self.isOutPlayer:
                 self.human.currentOvers = [self.human.remainingOver, self.human.remainingBalls]
                 self.bot.currentOvers = [self.bot.remainingOver, self.bot.remainingBalls]
                 # self.human.showScore()
                 # self.bot.showScore()
                 break
-            if (self.bot.totalScore > self.human.totalScore and
-                    (
-                            self.human.remainingWicket == 0 or self.human.remainingOver == 0 and self.human.remainingBalls == 0) or
-                    (self.bot.totalScore < self.human.totalScore and
-                     (self.bot.remainingWicket == 0 or self.bot.remainingOver == 0 and self.bot.remainingBalls == 0))):
+            if (self.isOutBot and self.bot.totalScore < self.human.totalScore) or (self.isOutPlayer and self.human.totalScore < self.bot.totalScore):
                 print("Bot Won" if self.bot.totalScore > self.human.totalScore else
                       "You Won!!!" if self.bot.totalScore < self.human.totalScore else
                       "Tied!!!")
                 break
-            print("\n\n\n", self.human.__dict__, "\n", self.bot.__dict__, "\n\n\n")
 
 
 Play().start()
