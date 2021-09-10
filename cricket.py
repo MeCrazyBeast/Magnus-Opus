@@ -79,9 +79,11 @@ class Play:
         self.isOutBot: bool = False
         self.isOutPlayer: bool = False
         self.outCounter: int = 0
+        self.bot: Bot
+        self.human: Human
 
     def start(self):
-        playerName = input("Enter your name: ")
+        self.playerName = input("Enter your name: ")
         if input("Do you want to give bot a name? ").lower() in ["yes", "y"]:
             self.botName = input("Enter name: ")
         if input("Do you want to change the default settings (wickets=10 && overs=10)? ").lower() in ["yes", "y"]:
@@ -97,7 +99,7 @@ class Play:
             self.human.throwToss()
             if int(random.random() * 6) % 2 != 0:
                 choice = input(
-                    "You Won!\nPlease selet your options: \tOffense (O) or Defence (D)\nPlease enter: ").lower()
+                    "You Won!\nPlease select your options: \tOffense (O) or Defence (D)\nPlease enter: ").lower()
                 self.human.tossResult = "Won"
             else:
                 choice = "o" if int(random.random() * 6) % 2 != 0 else "d"
@@ -108,7 +110,7 @@ class Play:
                 break
         # Toss:
         # Play:
-        while (True):
+        while True:
             self.human.play()
             self.bot.play(self.playType)
             if self.playType == "o":
@@ -119,10 +121,10 @@ class Play:
                 if self.human.currentHit == self.bot.currentHit:
                     self.human.remainingWicket -= 1
                     print("Ok")
-                    self.isOutPlayer = self.human.remainingWicket == 0 or (
-                            self.human.remainingOver == self.human.remainingBalls == 0)
                 else:
                     self.human.totalScore += self.human.currentHit
+                self.isOutPlayer = self.human.remainingWicket == 0 or (
+                        self.human.remainingOver == self.human.remainingBalls == 0)
             else:
                 if self.bot.remainingBalls == 0:
                     self.bot.remainingOver -= 1
@@ -131,11 +133,11 @@ class Play:
                 if self.bot.currentHit == self.human.currentHit:
                     self.bot.remainingWicket -= 1
                     print("Ok")
-                    self.isOutBot = self.human.remainingWicket == 0 or (
-                            self.human.remainingOver == self.human.remainingBalls == 0)
                 else:
                     self.bot.totalScore += self.bot.currentHit
-            if self.isOutBot or self.isOutPlayer and self.outCounter == 0:
+                self.isOutBot = self.bot.remainingWicket == 0 or (
+                        self.bot.remainingOver == self.bot.remainingBalls == 0)
+            if (self.isOutBot or self.isOutPlayer) and self.outCounter == 0:
                 print("Pog")
                 self.outCounter += 1
                 self.playType = "o" if self.playType == "d" else "d"
@@ -145,7 +147,8 @@ class Play:
                 # self.human.showScore()
                 # self.bot.showScore()
                 break
-            if (self.isOutBot and self.bot.totalScore < self.human.totalScore) or (self.isOutPlayer and self.human.totalScore < self.bot.totalScore):
+            if (self.isOutBot and self.bot.totalScore < self.human.totalScore) or (
+                    self.isOutPlayer and self.human.totalScore < self.bot.totalScore):
                 print("Bot Won" if self.bot.totalScore > self.human.totalScore else
                       "You Won!!!" if self.bot.totalScore < self.human.totalScore else
                       "Tied!!!")
